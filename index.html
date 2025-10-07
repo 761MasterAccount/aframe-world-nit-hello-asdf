@@ -8,7 +8,7 @@
 		<script>
 			// User permissions for A-Frame Inspector
 			window.AFRAME_SCENE_PERMISSIONS = {
-				userRole: "editor",
+				userRole: "owner",
 				canEdit: true,
 				isPublic: false,
 				readOnly: false
@@ -20,21 +20,48 @@
 				readOnly: false
 			};
 			
-			// If user cannot edit, disable inspector entirely
+			// For viewers, inspector script is not loaded, so just provide user feedback
 			if (false) {
-				// Override the inspector toggle to show a message instead
-				document.addEventListener('DOMContentLoaded', function() {
-					window.addEventListener('keydown', function(evt) {
-						const shortcutPressed = evt.keyCode === 73 && 
-							((evt.ctrlKey && evt.altKey) || evt.getModifierState('AltGraph'));
-						if (shortcutPressed) {
-							evt.preventDefault();
-							evt.stopPropagation();
-							alert('Inspector disabled: You have read-only access to this scene.');
-							return false;
+				// Block keyboard shortcuts and show message
+				document.addEventListener('keydown', function(evt) {
+					const shortcutPressed = evt.keyCode === 73 && 
+						((evt.ctrlKey && evt.altKey) || evt.getModifierState('AltGraph'));
+					if (shortcutPressed) {
+						evt.preventDefault();
+						evt.stopPropagation();
+						showViewerMessage();
+						return false;
+					}
+				}, true);
+				
+				function showViewerMessage() {
+					// Create a temporary notification
+					const notification = document.createElement('div');
+					notification.style.cssText = `
+						position: fixed;
+						top: 50%;
+						left: 50%;
+						transform: translate(-50%, -50%);
+						background: rgba(255, 152, 0, 0.95);
+						color: white;
+						padding: 20px 30px;
+						border-radius: 8px;
+						font-family: Arial, sans-serif;
+						font-size: 16px;
+						z-index: 999999;
+						text-align: center;
+						box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+					`;
+					notification.innerHTML = '🔒 Inspector Not Available<br><small>You have read-only access to this scene</small>';
+					document.body.appendChild(notification);
+					
+					// Remove notification after 3 seconds
+					setTimeout(() => {
+						if (notification.parentNode) {
+							notification.parentNode.removeChild(notification);
 						}
-					}, true); // Use capture to intercept before inspector
-				});
+					}, 3000);
+				}
 			}
 		</script>
 	</head>
@@ -42,10 +69,12 @@
 		<a-scene>
 			<!-- User entities -->
 			      <a-box position="-6.41661 0.54874 -2.60257" rotation="0 45 0" color="#4CC3D9" buffer="true" skipCache="false" depth="1" height="1" width="1" segmentsHeight="1" segmentsWidth="1" segmentsDepth="1" skipcache="false" segmentsheight="1" segmentswidth="1" segmentsdepth="1"></a-box>
-      <a-sphere position="0.25405 2.0393 -22.51598" color="#EF2D5E" buffer="true" skipCache="false" radius="1.25" phiLength="360" phiStart="0" thetaLength="180" thetaStart="0" segmentsHeight="18" segmentsWidth="36" skipcache="false" philength="360" phistart="0" thetalength="180" thetastart="0" segmentsheight="18" segmentswidth="36"></a-sphere>
+      <a-sphere position="-1.70577 -1.18369 -0.38027" color="#EF2D5E" buffer="true" skipCache="false" radius="1.25" phiLength="360" phiStart="0" thetaLength="180" thetaStart="0" segmentsHeight="18" segmentsWidth="36" skipcache="false" philength="360" phistart="0" thetalength="180" thetastart="0" segmentsheight="18" segmentswidth="36"></a-sphere>
       <a-cylinder position="-4.18041 0.75 -16.84448" color="#FFC65D" buffer="true" skipCache="false" height="1.5" openEnded="false" radius="0.5" segmentsHeight="18" segmentsRadial="36" thetaLength="360" thetaStart="0" skipcache="false" openended="false" segmentsheight="18" segmentsradial="36" thetalength="360" thetastart="0"></a-cylinder>
       <a-plane position="-2.17062 0.90251 -3.33772" rotation="-90 0 0" color="#7BC8A4" buffer="true" skipCache="false" height="4" width="4" segmentsHeight="1" segmentsWidth="1" skipcache="false" segmentsheight="1" segmentswidth="1"></a-plane>
       <a-sky scale="-1 1 1" color="#ECECEC" buffer="true" skipCache="false" radius="500" phiLength="360" phiStart="0" thetaLength="180" thetaStart="0" segmentsHeight="32" segmentsWidth="64" skipcache="false" philength="360" phistart="0" thetalength="180" thetastart="0" segmentsheight="32" segmentswidth="64"></a-sky>
+      <a-plane id="ground" position="0 0 -4" rotation="-90 0 0" color="#7BC8A4" buffer="true" skipCache="false" height="4" width="4" segmentsHeight="1" segmentsWidth="1" skipcache="false" segmentsheight="1" segmentswidth="1"></a-plane>
+      <a-sky id="sky" scale="-1 1 1" color="#ECECEC" buffer="true" skipCache="false" radius="500" phiLength="360" phiStart="0" thetaLength="180" thetaStart="0" segmentsHeight="32" segmentsWidth="64" skipcache="false" philength="360" phistart="0" thetalength="180" thetastart="0" segmentsheight="32" segmentswidth="64"></a-sky>
       <a-plane id="ground" position="0 0 -4" rotation="-90 0 0" color="#7BC8A4" buffer="true" skipCache="false" height="4" width="4" segmentsHeight="1" segmentsWidth="1"></a-plane>
       <a-sky id="sky" scale="-1 1 1" color="#ECECEC" buffer="true" skipCache="false" radius="500" phiLength="360" phiStart="0" thetaLength="180" thetaStart="0" segmentsHeight="32" segmentsWidth="64"></a-sky>
 			<a-plane
